@@ -54,7 +54,7 @@ authenticate.post('/authenticate', function (req, res) {
                 loggedIn = true;
                 res.status(200).send({
                     success: true, message: 'Login Correcto',
-                    usuario: { _id: usuario._id, username: usuario.username, nombre: usuario.nombre, apellido: usuario.apellido, dni: usuario.dni }
+                    usuario: { _id: usuario._id, username: usuario.username, nombre: usuario.nombre, apellido: usuario.apellido, dni: usuario.dni, email: usuario.email }
                 }); // para no pasar la pass
             }
 
@@ -63,6 +63,8 @@ authenticate.post('/authenticate', function (req, res) {
 });
 
 app.use('/api', authenticate);
+usuarios.route('/usuarios')
+    .post(UsuarioCtrl.saveUsuario);
 
 authenticate.route('/logout')
     .post(function (req, res) {
@@ -80,7 +82,13 @@ alumnos.route('/alumnos/:_id')
     .delete(AlumnoCtrl.deleteAlumno);
 
 alumnos.route('/alumnos/:_idAlumno/curso/:_idCurso')
-    .post(AlumnoCtrl.inscribirAlumno);
+    .get(AlumnoCtrl.inscribirAlumno);
+
+alumnos.route('/alumnos/:_idAlumno/curso/:_idCurso/desinscribir')
+    .get(AlumnoCtrl.desinscribirAlumno);
+
+alumnos.route('/alumnos/usuario/:username')
+    .get(AlumnoCtrl.findAlumnoByUsername);
 
 cursos.route('/cursos')
     .get(CursoCtrl.findAllCursos)

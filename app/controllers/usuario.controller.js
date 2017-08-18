@@ -30,7 +30,7 @@ exports.saveUsuario = function (req, res) {
     usuario.save(function (err) {
         if (err)
             res.send(err);
-        res.json({ message: 'Usuario creado' });
+        res.jsonp(usuario);
     });
 };
 
@@ -49,17 +49,19 @@ exports.updateUsuario = function (req, res) {
 
         usuario.save(function (err) {
             if (err) return res.send(500, err.message);
-            res.status(200).jsonp(usuario);
+            res.jsonp(usuario);
             // res.json(usuario);
         });
 
         // Update del usuario contenido en el alumno
         Alumno.findOne({ 'usuario.username': usuario.username }, function (err, alumno) {
-            alumno.usuario = usuario;
-            alumno.save(function (err) {
-                if (err) return console.log('Error al actualizar alumno');
-                console.log('Usuario: ' + usuario.username + ' nested en Alumno: ' + alumno._id + ' actualizado');
-            });
+            if (alumno != null) {
+                alumno.usuario = usuario;
+                alumno.save(function (err) {
+                    if (err) return console.log('Error al actualizar alumno');
+                    console.log('Usuario: ' + usuario.username + ' nested en Alumno: ' + alumno._id + ' actualizado');
+                });
+            }
         });
     });
 };
@@ -73,11 +75,13 @@ exports.deleteUsuario = function (req, res) {
         })
 
         Alumno.findOne({ 'usuario.username': usuario.username }, function (err, alumno) {
-            alumno.usuario = {};
-            alumno.save(function (err) {
-                if (err) return console.log('Error al actualizar alumno');
-                console.log('Usuario: ' + usuario.username + ' nested en Alumno: ' + alumno._id + ' actualizado');
-            });
+            if (alumno != null) {
+                alumno.remove(function (err) {
+                    if (err) return res.send(500, err.message);
+                    // res.status(200);
+                    res.json({ message: 'Alumno eliminado' });
+                })
+            }
         });
     });
 };
